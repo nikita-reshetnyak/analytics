@@ -1,10 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"grpc-sevice/internal/config"
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/nikita-reshetnyak/analytics/internal/app"
+	"github.com/nikita-reshetnyak/analytics/internal/config"
 )
 
 var (
@@ -16,7 +19,16 @@ var (
 func main() {
 	config := config.MustLoad()
 	logger := setupLogger(config.Env)
-	fmt.Println(logger)
+	application := app.New(logger, config.GRPC.Port)
+	go func() {
+		application.GRPCServer.MustRun()
+	}()
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+	<-stop
+	application.GRPCServer.Stop()
+	logger.Info("Gracefully stopped")
+
 }
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
