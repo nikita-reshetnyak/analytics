@@ -8,6 +8,7 @@ import (
 
 	"github.com/nikita-reshetnyak/analytics/internal/app"
 	"github.com/nikita-reshetnyak/analytics/internal/config"
+	slogprettyhandlers "github.com/nikita-reshetnyak/analytics/internal/lib/logger/handlers"
 )
 
 var (
@@ -34,7 +35,7 @@ func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 	switch env {
 	case envLocal:
-		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+		log = setupPrettySlog()
 	case envDev:
 		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	case envProd:
@@ -42,4 +43,15 @@ func setupLogger(env string) *slog.Logger {
 
 	}
 	return log
+}
+func setupPrettySlog() *slog.Logger {
+	opts := slogprettyhandlers.PrettyHandlerOptions{
+		SlogOpts: &slog.HandlerOptions{
+			Level: slog.LevelDebug,
+		},
+	}
+
+	handler := opts.NewPrettyHandler(os.Stdout)
+
+	return slog.New(handler)
 }
