@@ -1,4 +1,4 @@
-package grpcanalytics
+package analyticsgrpc
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 type Analytics interface {
-	SendEvent(ctx context.Context, name string, date time.Time)
+	SendEvent(ctx context.Context, name string, date time.Time) error
 }
 type serverApi struct {
 	v1.UnimplementedAnalyticsServer
