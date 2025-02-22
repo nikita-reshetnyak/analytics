@@ -15,7 +15,8 @@ func New(log *slog.Logger) *Analytics {
 }
 func (a *Analytics) SendEvent(ctx context.Context, name string, date time.Time) error {
 	const op = "Analytics.SendEvent"
-	a.log.With(
+	a.log.Info(
+		"event sent",
 		slog.String("op", op),
 		slog.String("name", name),
 		slog.String("date", date.String()),

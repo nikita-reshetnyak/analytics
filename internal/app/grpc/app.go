@@ -16,7 +16,7 @@ import (
 
 type App struct {
 	log        *slog.Logger
-	gRPCServer *grpc.Server
+	grpcServer *grpc.Server
 	port       int
 }
 
@@ -43,7 +43,7 @@ func New(log *slog.Logger, analyticsService analyticsgrpc.Analytics, port int) *
 	return &App{
 		log:        log,
 		port:       port,
-		gRPCServer: gRPCServer,
+		grpcServer: gRPCServer,
 	}
 }
 func InterceptorLogger(l *slog.Logger) logging.Logger {
@@ -63,7 +63,7 @@ func (a *App) Run() error {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	a.log.Info("grpc server is started", slog.String("addr", listener.Addr().String()))
-	if err := a.gRPCServer.Serve(listener); err != nil {
+	if err := a.grpcServer.Serve(listener); err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
 	return nil
@@ -72,5 +72,5 @@ func (a *App) Stop() {
 	const op = "grpcapp.Stop"
 	a.log.With(slog.String("op", op)).
 		Info("stopping gRPC server", slog.Int("port", a.port))
-	a.gRPCServer.GracefulStop()
+	a.grpcServer.GracefulStop()
 }
